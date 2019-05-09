@@ -1,0 +1,9 @@
+html, body {
+	min-height: 100vh;
+	height: 100%;
+}
+
+.container {
+	top: 50%;
+	transform: perspective(1px) translateY(-50%);
+}

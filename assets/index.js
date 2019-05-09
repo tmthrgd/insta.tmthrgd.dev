@@ -5,16 +5,17 @@ document.querySelector('.download-form').addEventListener('submit', e => {
 	let u;
 	try {
 		u = new URL(urlField.value);
-		if (u.host !== 'www.instagram.com' || !u.pathname.startsWith('/p/')) {
-			urlField.setCustomValidity('Must be Instagram post URL');
-			return;
-		}
-
-		urlField.setCustomValidity('');
 	} catch (e) {
 		urlField.setCustomValidity(e.toString());
 		return;
 	}
+
+	if (u.host !== 'www.instagram.com' || !u.pathname.startsWith('/p/')) {
+		urlField.setCustomValidity('Must be Instagram post URL');
+		return;
+	}
+
+	urlField.setCustomValidity('');
 
 	location.pathname = u.pathname;
 });

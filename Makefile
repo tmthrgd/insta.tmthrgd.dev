@@ -8,7 +8,7 @@ generate:
 	go generate
 
 serve:
-	go run .
+	go run --tags dev .
 
 deploy:
 	gcloud builds submit --tag gcr.io/insta-tmthrgd-dev/server
