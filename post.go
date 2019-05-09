@@ -39,10 +39,15 @@ var errNoDisplayURL = errors.New("unable to find display_url in window._sharedDa
 
 func postHandler() http.HandlerFunc {
 	return errorHandler(func(w http.ResponseWriter, r *http.Request) error {
+		path := r.URL.Path
+		if strings.HasSuffix(path, "/json") {
+			path = path[:len(path)-len("json")]
+		}
+
 		u := &url.URL{
 			Scheme: "https",
 			Host:   "www.instagram.com",
-			Path:   r.URL.Path,
+			Path:   path,
 		}
 		// TODO: use http.NewRequestWithContext once go1.13 lands.
 		req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
@@ -72,6 +77,16 @@ func postHandler() http.HandlerFunc {
 		displayURLs, err := processJSONData(node)
 		if err != nil {
 			return err
+		}
+
+		if strings.HasSuffix(r.URL.Path, "/json") {
+			return json.NewEncoder(w).Encode(&struct {
+				PostID string   `json:"post_id"`
+				Images []string `json:"images"`
+			}{
+				chi.URLParam(r, "postID"),
+				displayURLs,
+			})
 		}
 
 		return templateExecute(w, postTmpl, &struct {

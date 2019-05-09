@@ -32,7 +32,10 @@ func main() {
 	// HTML page routes
 	router.Group(func(r chi.Router) {
 		r.Get("/", indexHandler())
-		r.Get("/p/{postID}/", postHandler())
+
+		post := postHandler()
+		r.Get("/p/{postID}/", post)
+		r.Get("/p/{postID}/json", post)
 	})
 
 	port := os.Getenv("PORT")
