@@ -12,37 +12,37 @@ import (
 	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
 )
 
-const error404 = `<!doctype html>
+var errorTmpl = newTemplate(`<!doctype html>
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>404 Not Found – insta.tmthrgd.dev</title>
+<title>{{.StatusCode}} {{httpStatusText .StatusCode}} – insta.tmthrgd.dev</title>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel=stylesheet href=/assets/error.css>
 <main class=container>
-<h1>404 Not Found</h1>
-<p>The requested file was not found.</p>
-</main>`
-
-var error500 = newTemplate(`<!doctype html>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>500 Internal Server Error – insta.tmthrgd.dev</title>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
-<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel=stylesheet href=/assets/error.css>
-<main class=container>
-<h1>500 Internal Server Error</h1>
-<p>{{.Type}}: {{.Message}}</p>
+<h1>{{.StatusCode}} {{httpStatusText .StatusCode}}</h1>
+<p>{{.Message}}</p>
 </main>`)
 
 const robots = "User-agent: *\nDisallow: /"
 
+type errorData struct {
+	StatusCode int
+	Message    string
+}
+
 // notFoundHandler returns a handler that serves a 404 error page.
 func notFoundHandler() http.HandlerFunc {
-	return handlers.ServeError(http.StatusNotFound, []byte(error404), "text/html; charset=utf-8").ServeHTTP
+	h, err := handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, &errorData{
+		http.StatusNotFound,
+		"The requested file was not found.",
+	}, "text/html; charset=utf-8")
+	if err != nil {
+		panic(err)
+	}
+
+	return h.ServeHTTP
 }
 
 // faviconHandler returns a handler that serves the favicon.ico file.
@@ -73,11 +73,9 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusInternalServerError)
 
-		error500.Execute(w, &struct {
-			Type, Message string
-		}{
-			reflect.ValueOf(err).Type().String(),
-			err.Error(),
+		errorTmpl.Execute(w, &errorData{
+			http.StatusInternalServerError,
+			reflect.ValueOf(err).Type().String() + ": " + err.Error(),
 		})
 	}
 }
@@ -101,7 +99,11 @@ func templateExecute(w http.ResponseWriter, tmpl *template.Template, data interf
 // newTemplate parses source and returns a new html/template.Template. It
 // panics if source is invalid.
 func newTemplate(source string) *template.Template {
-	return template.Must(template.New("").Parse(source))
+	return template.Must(template.New("").Funcs(templateFuncs).Parse(source))
+}
+
+var templateFuncs = template.FuncMap{
+	"httpStatusText": http.StatusText,
 }
 
 type noDirFileSystem struct{ http.FileSystem }
