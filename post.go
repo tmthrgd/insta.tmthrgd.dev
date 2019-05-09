@@ -80,6 +80,7 @@ func postHandler() http.HandlerFunc {
 		}
 
 		if strings.HasSuffix(r.URL.Path, "/json") {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			return json.NewEncoder(w).Encode(&struct {
 				PostID string   `json:"post_id"`
 				Images []string `json:"images"`
@@ -89,6 +90,7 @@ func postHandler() http.HandlerFunc {
 			})
 		}
 
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		return templateExecute(w, postTmpl, &struct {
 			PostID      string
 			DisplayURLs []string
