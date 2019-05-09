@@ -10,12 +10,12 @@ document.querySelector('.download-form').addEventListener('submit', e => {
 		return;
 	}
 
-	if (u.host !== 'www.instagram.com' || !u.pathname.startsWith('/p/')) {
-		urlField.setCustomValidity('Must be Instagram post URL');
+	if (u.host !== 'www.instagram.com' || !u.pathname.includes('/p/')) {
+		urlField.setCustomValidity('Must be Instagram post URL.');
 		return;
 	}
 
 	urlField.setCustomValidity('');
 
-	location.pathname = u.pathname;
+	location.pathname = u.pathname.slice(u.pathname.indexOf('/p/'));
 });
