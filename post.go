@@ -35,7 +35,21 @@ var postTmpl = newTemplate(`<!doctype html>
 {{- end}}
 </main>`)
 
-var errNoDisplayURL = errors.New("unable to find display_url in window._sharedData")
+var (
+	errNoDisplayURL   = errors.New("unable to find display_url in window._sharedData")
+	errPrivateAccount = errors.New("this post belongs to a private Instagram account")
+)
+
+var postClient = &http.Client{
+	Transport: http.DefaultTransport,
+	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		if !strings.Contains(req.URL.Path, "/p/") {
+			return errPrivateAccount
+		}
+
+		return nil
+	},
+}
 
 func postHandler() http.HandlerFunc {
 	return errorHandler(func(w http.ResponseWriter, r *http.Request) error {
@@ -53,7 +67,7 @@ func postHandler() http.HandlerFunc {
 		req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 		req = req.WithContext(r.Context())
 
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := postClient.Do(req)
 		if err != nil {
 			return err
 		}

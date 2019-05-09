@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
 	"time"
@@ -74,12 +75,20 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			statusCode = http.StatusInternalServerError
 			msg        string
 		)
-		switch he, ok := err.(httpError); {
-		case ok && he.StatusCode == http.StatusNotFound:
-			statusCode = http.StatusNotFound
-			msg = "The requested file was not found."
-		case ok:
+		switch err := err.(type) {
+		case httpError:
 			statusCode = http.StatusBadGateway
+
+			if err.StatusCode == http.StatusNotFound {
+				statusCode = http.StatusNotFound
+				msg = "The requested file was not found."
+			}
+		case *url.Error:
+			// TODO: use errors.Is once go1.13 lands.
+			if err.Err == errPrivateAccount {
+				statusCode = http.StatusForbidden
+				msg = "This post belongs to a private Instagram account."
+			}
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
