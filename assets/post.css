@@ -1,0 +1,49 @@
+html, body {
+	min-height: 100vh;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.container {
+	margin-top: 3rem;
+	margin-bottom: 3rem;
+}
+
+.post-images {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 2rem;
+
+	padding: 0;
+
+	list-style-type: none;
+}
+
+@media (max-width: 45rem) {
+	.post-images {
+		grid-template-columns: 1fr;
+	}
+}
+
+.post-images li {
+	margin: 0;
+}
+
+.post-images .post-image {
+	display: block;
+
+	height: auto;
+	width: 100%;
+
+	border: thin solid #ccc;
+}
+
+.post-image {
+	max-width: 100%;
+
+	border: thin solid #ccc;
+}
