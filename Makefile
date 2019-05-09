@@ -12,4 +12,4 @@ serve:
 
 deploy:
 	gcloud builds submit --tag gcr.io/insta-tmthrgd-dev/server
-	gcloud beta run deploy --image gcr.io/insta-tmthrgd-dev/server
+	gcloud beta run deploy server --image gcr.io/insta-tmthrgd-dev/server
