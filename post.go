@@ -59,6 +59,10 @@ func postHandler() http.HandlerFunc {
 		}
 		defer resp.Body.Close()
 
+		if resp.StatusCode != http.StatusOK {
+			return httpError{resp}
+		}
+
 		body, err := charset.NewReader(resp.Body, resp.Header.Get("Content-Type"))
 		if err != nil {
 			return err

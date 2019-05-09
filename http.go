@@ -70,12 +70,28 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			return
 		}
 
+		var (
+			statusCode = http.StatusInternalServerError
+			msg        string
+		)
+		switch he, ok := err.(httpError); {
+		case ok && he.StatusCode == http.StatusNotFound:
+			statusCode = http.StatusNotFound
+			msg = "The requested file was not found."
+		case ok:
+			statusCode = http.StatusBadGateway
+		}
+
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(statusCode)
+
+		if msg == "" {
+			msg = reflect.ValueOf(err).Type().String() + ": " + err.Error()
+		}
 
 		errorTmpl.Execute(w, &errorData{
-			http.StatusInternalServerError,
-			reflect.ValueOf(err).Type().String() + ": " + err.Error(),
+			statusCode,
+			msg,
 		})
 	}
 }
@@ -120,4 +136,10 @@ func (fs *noDirFileSystem) Open(name string) (http.File, error) {
 	}
 
 	return f, nil
+}
+
+type httpError struct{ *http.Response }
+
+func (he httpError) Error() string {
+	return "upstream HTTP error: " + he.Response.Request.URL.String() + ": " + he.Response.Status
 }
