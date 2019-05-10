@@ -23,7 +23,7 @@ RUN go mod download
 COPY . .
 
 # Build the command inside the container.
-RUN go build -v -mod=readonly -o server
+RUN go build -v -mod=readonly -o /server
 
 # Use a Docker multi-stage build to create a lean production image.
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
@@ -33,7 +33,7 @@ FROM alpine
 RUN apk add ca-certificates
 
 # Copy the binary to the production image from the builder stage.
-COPY --from=builder /go/src/tmthrgd.dev/go/insta.tmthrgd.dev/server /server
+COPY --from=builder /server /
 
 # Run the web service on container startup.
 CMD ["/server"]
