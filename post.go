@@ -43,7 +43,8 @@ var (
 var postClient = &http.Client{
 	Transport: http.DefaultTransport,
 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
-		if !strings.Contains(req.URL.Path, "/p/") {
+		if strings.Contains(via[0].URL.Path, "/p/") &&
+			!strings.Contains(req.URL.Path, "/p/") {
 			return errPrivateAccount
 		}
 
