@@ -20,7 +20,7 @@ const indexPage = `<!doctype html>
 <form action="" class=download-form>
 <div class=row>
 <label for=url>Instagram URL: </label>
-<input type=url class=u-full-width id=url required placeholder=https://www.instagram.com/p/...>
+<input type=url class=u-full-width id=url required placeholder=https://www.instagram.com/p/... pattern="https?://(www\.|m\.)?instagram\.com/(.+/)?p/[A-Za-z0-9\-_]+/?(\?.*)?(#.*)?">
 </div>
 <input type=submit value=Download>
 </form>

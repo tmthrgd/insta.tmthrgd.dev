@@ -1,21 +1,7 @@
 document.querySelector('.download-form').addEventListener('submit', e => {
 	e.preventDefault();
 
-	const urlField = e.target.querySelector('#url');
-	let u;
-	try {
-		u = new URL(urlField.value);
-	} catch (e) {
-		urlField.setCustomValidity(e.toString());
-		return;
-	}
-
-	if (u.host !== 'www.instagram.com' || !u.pathname.includes('/p/')) {
-		urlField.setCustomValidity('Must be Instagram post URL.');
-		return;
-	}
-
-	urlField.setCustomValidity('');
-
-	location.pathname = u.pathname.slice(u.pathname.indexOf('/p/'));
+	const u = new URL(e.target.querySelector('#url').value);
+	location.pathname = u.pathname.slice(u.pathname.indexOf('/p/'))
+		+ (u.pathname.endsWith('/') ? '' : '/');
 });
