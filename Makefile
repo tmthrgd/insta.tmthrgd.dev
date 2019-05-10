@@ -1,6 +1,6 @@
 export GO111MODULE=on
 
-.PHONY: all generate serve deploy docker-server docker-stop
+.PHONY: all generate serve deploy docker-serve docker-stop
 
 all:
 
