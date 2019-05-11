@@ -30,3 +30,6 @@ golang.org/x/tools v0.0.0-20190509153222-73554e0f7805 h1:1ufBXAsTpUhSmmPXEEs5PrG
 golang.org/x/tools v0.0.0-20190509153222-73554e0f7805/go.mod h1:RgjU9mgBXZiqYHBnxXauZ1Gv1EHHAz9KjViQ78xBX0Q=
 tmthrgd.dev/go/vfshash v0.0.0-20190511013846-243ed7760ada h1:rM9ZYNKWjZvcW8pWYNEFYP00MPxc5Jr7aheQ3IvI6UE=
 tmthrgd.dev/go/vfshash v0.0.0-20190511013846-243ed7760ada/go.mod h1:V3sJaBpnmo1Q2iGdq5LBAt49XBlieWxOedOGOGtCAog=
+tmthrgd.dev/go/vfshash v0.0.0-20190511053043-0b75f3b5ad41/go.mod h1:V3sJaBpnmo1Q2iGdq5LBAt49XBlieWxOedOGOGtCAog=
+tmthrgd.dev/go/vfshash v0.0.0-20190511075048-d2ea1243b87f h1:GdlvNzLTc6cc4328h8PTECpCx1uP6dbHWhUubPEewos=
+tmthrgd.dev/go/vfshash v0.0.0-20190511075048-d2ea1243b87f/go.mod h1:V3sJaBpnmo1Q2iGdq5LBAt49XBlieWxOedOGOGtCAog=
