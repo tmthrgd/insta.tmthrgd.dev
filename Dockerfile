@@ -32,6 +32,9 @@ FROM alpine
 # Install needed root TLS certificate authorities.
 RUN apk add ca-certificates
 
+# Copy /etc/mime.types to the production image from the builder stage.
+COPY --from=builder /etc/mime.types /etc
+
 # Copy the binary to the production image from the builder stage.
 COPY --from=builder /server /
 
