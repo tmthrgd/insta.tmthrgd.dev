@@ -149,9 +149,12 @@ func (fs *noDirFileSystem) Open(name string) (http.File, error) {
 		return nil, err
 	}
 
-	if stat, err := f.Stat(); err == nil && stat.IsDir() {
+	if stat, err := f.Stat(); err != nil {
 		f.Close()
-		return nil, os.ErrNotExist
+		return nil, err
+	} else if stat.IsDir() {
+		f.Close()
+		return nil, &os.PathError{Op: "open", Path: name, Err: os.ErrNotExist}
 	}
 
 	return f, nil
