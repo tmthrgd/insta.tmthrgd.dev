@@ -7,7 +7,7 @@ import (
 	handlers "github.com/tmthrgd/httphandlers"
 )
 
-const indexPage = `<!doctype html>
+var indexTmpl = newTemplate(`<!doctype html>
 <html lang=en>
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
@@ -15,7 +15,7 @@ const indexPage = `<!doctype html>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel=stylesheet href=/assets/index.css>
+<link rel=stylesheet href={{assetPath "/index.css"}}>
 <main class=container>
 <form action="" class=download-form>
 <div class=row>
@@ -25,8 +25,13 @@ const indexPage = `<!doctype html>
 <input type=submit value=Download>
 </form>
 </main>
-<script defer src=/assets/index.js></script>`
+<script defer src={{assetPath "/index.js"}}></script>`)
 
 func indexHandler() http.HandlerFunc {
-	return handlers.ServeString("index.html", time.Now(), indexPage).ServeHTTP
+	h, err := handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	return h.ServeHTTP
 }

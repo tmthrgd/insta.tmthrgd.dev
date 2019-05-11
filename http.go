@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"reflect"
 	"time"
 
 	handlers "github.com/tmthrgd/httphandlers"
 	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
+	"tmthrgd.dev/go/vfshash"
 )
 
 var errorTmpl = newTemplate(`<!doctype html>
@@ -20,13 +22,15 @@ var errorTmpl = newTemplate(`<!doctype html>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel=stylesheet href=/assets/error.css>
+<link rel=stylesheet href={{assetPath "/error.css"}}>
 <main class=container>
 <h1>{{.StatusCode}} {{httpStatusText .StatusCode}}</h1>
 <p>{{.Message}}</p>
 </main>`)
 
 const robots = "User-agent: *\nDisallow: /"
+
+var assetNames = vfshash.NewAssetNames(assets.FileSystem)
 
 type errorData struct {
 	StatusCode int
@@ -48,7 +52,7 @@ func notFoundHandler() http.HandlerFunc {
 
 // faviconHandler returns a handler that serves the favicon.ico file.
 func faviconHandler() http.HandlerFunc {
-	return http.FileServer(&noDirFileSystem{assets.FileSystem}).ServeHTTP
+	return http.FileServer(assetNames).ServeHTTP
 }
 
 // robotsHandler returns a handler that serves the robots.txt file.
@@ -129,6 +133,12 @@ func newTemplate(source string) *template.Template {
 
 var templateFuncs = template.FuncMap{
 	"httpStatusText": http.StatusText,
+	"assetPath":      assetPath,
+}
+
+// assetPath returns the path to a named asset file.
+func assetPath(name string) string {
+	return path.Join("/assets/", assetNames.Lookup(name))
 }
 
 type noDirFileSystem struct{ http.FileSystem }

@@ -26,5 +26,7 @@ golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJ
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
-golang.org/x/tools v0.0.0-20190509014725-d996b19ee77c h1:FsgttePhaNW32agh7vOjhKj0IuEmI/TmGumOc4z9yEs=
-golang.org/x/tools v0.0.0-20190509014725-d996b19ee77c/go.mod h1:RgjU9mgBXZiqYHBnxXauZ1Gv1EHHAz9KjViQ78xBX0Q=
+golang.org/x/tools v0.0.0-20190509153222-73554e0f7805 h1:1ufBXAsTpUhSmmPXEEs5PrGQSfnBhsjAd2SmVhp9xrY=
+golang.org/x/tools v0.0.0-20190509153222-73554e0f7805/go.mod h1:RgjU9mgBXZiqYHBnxXauZ1Gv1EHHAz9KjViQ78xBX0Q=
+tmthrgd.dev/go/vfshash v0.0.0-20190511013846-243ed7760ada h1:rM9ZYNKWjZvcW8pWYNEFYP00MPxc5Jr7aheQ3IvI6UE=
+tmthrgd.dev/go/vfshash v0.0.0-20190511013846-243ed7760ada/go.mod h1:V3sJaBpnmo1Q2iGdq5LBAt49XBlieWxOedOGOGtCAog=
