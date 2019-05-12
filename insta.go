@@ -46,8 +46,11 @@ func main() {
 		).Get("/", indexHandler())
 
 		post := postHandler()
-		r.Get("/p/{postID}/", post)
-		r.Get("/p/{postID}/json", post)
+		rr := r.With(
+			handlers.SetHeaderWrap("Cache-Control", "public, max-age=300"), // 5 minutes
+		)
+		rr.Get("/p/{postID}/", post)
+		rr.Get("/p/{postID}/json", post)
 	})
 
 	port := os.Getenv("PORT")
