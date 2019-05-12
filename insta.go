@@ -27,12 +27,15 @@ func main() {
 
 	// Asset routes
 	router.Group(func(r chi.Router) {
-		r.Get("/favicon.ico", faviconHandler())
-		r.Get("/robots.txt", robotsHandler())
+		rr := r.With(
+			handlers.SetHeaderWrap("Cache-Control", "public, max-age=1209600"), // 14 days
+		)
+		rr.Get("/favicon.ico", faviconHandler())
+		rr.Get("/robots.txt", robotsHandler())
 
 		r.With(
 			handlers.NeverModified,
-			handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"),
+			handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"), // 1 year
 		).Mount("/assets", assetsHandler())
 	})
 
