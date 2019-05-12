@@ -41,7 +41,9 @@ func main() {
 
 	// HTML page routes
 	router.Group(func(r chi.Router) {
-		r.Get("/", indexHandler())
+		r.With(
+			handlers.SetHeaderWrap("Cache-Control", "public, max-age=3600"), // 1 hour
+		).Get("/", indexHandler())
 
 		post := postHandler()
 		r.Get("/p/{postID}/", post)
