@@ -30,7 +30,10 @@ func main() {
 		r.Get("/favicon.ico", faviconHandler())
 		r.Get("/robots.txt", robotsHandler())
 
-		r.Mount("/assets", assetsHandler())
+		r.With(
+			handlers.NeverModified,
+			handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"),
+		).Mount("/assets", assetsHandler())
 	})
 
 	// HTML page routes
