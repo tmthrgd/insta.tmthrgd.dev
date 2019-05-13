@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shurcooL/httpfs/filter"
 	handlers "github.com/tmthrgd/httphandlers"
 	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
 	"tmthrgd.dev/go/vfshash"
@@ -61,7 +62,7 @@ func robotsHandler() http.HandlerFunc {
 
 // assetsHandler returns a handler that serves site assets.
 func assetsHandler() http.Handler {
-	return http.StripPrefix("/assets", http.FileServer(&noDirFileSystem{assets.FileSystem}))
+	return http.StripPrefix("/assets", http.FileServer(filter.Skip(assets.FileSystem, excludeAssets)))
 }
 
 // errorHandler converts a handler with an error return to a http.HandlerFunc,
@@ -140,23 +141,9 @@ func assetPath(name string) string {
 	return path.Join("/assets/", assetNames.Lookup(name))
 }
 
-type noDirFileSystem struct{ http.FileSystem }
-
-func (fs *noDirFileSystem) Open(name string) (http.File, error) {
-	f, err := fs.FileSystem.Open(name)
-	if err != nil {
-		return nil, err
-	}
-
-	if stat, err := f.Stat(); err != nil {
-		f.Close()
-		return nil, err
-	} else if stat.IsDir() || strings.HasPrefix(stat.Name(), ".") {
-		f.Close()
-		return nil, &os.PathError{Op: "open", Path: name, Err: os.ErrNotExist}
-	}
-
-	return f, nil
+// excludeAssets returns true if the file should be excluded from the assets handler.
+func excludeAssets(path string, info os.FileInfo) bool {
+	return info.IsDir() || strings.HasPrefix(info.Name(), ".")
 }
 
 type httpError struct{ *http.Response }
