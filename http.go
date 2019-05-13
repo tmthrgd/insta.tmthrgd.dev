@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"html"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -102,7 +104,11 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			data.Message = reflect.ValueOf(err).Type().String() + ": " + err.Error()
 		}
 
-		errorTmpl.Execute(w, data)
+		if templateExecute(w, errorTmpl, data) != nil {
+			fmt.Fprintf(w, "%d %s: %s", data.StatusCode,
+				http.StatusText(data.StatusCode),
+				html.EscapeString(data.Message))
+		}
 	}
 }
 
