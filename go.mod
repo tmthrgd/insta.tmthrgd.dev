@@ -9,5 +9,5 @@ require (
 	github.com/tmthrgd/httphandlers v0.0.0-20190513021200-f1d2c578ad2b
 	github.com/tmthrgd/httputils v0.0.0-20190303111359-ec3de85dbccd // indirect
 	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
-	tmthrgd.dev/go/vfshash v0.0.0-20190511075048-d2ea1243b87f
+	tmthrgd.dev/go/vfshash v0.0.0-20190513022450-8b54546efbd9
 )
