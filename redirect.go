@@ -13,12 +13,12 @@ func pRedirectHandler() http.HandlerFunc {
 			return err
 		}
 
-		rawURL := r.Form.Get("url")
-		if rawURL == "" {
+		url := r.Form.Get("url")
+		if url == "" {
 			return os.ErrNotExist
 		}
 
-		if path, ok := validInstagramURL(rawURL); ok {
+		if path, ok := validInstagramURL(url); ok {
 			http.Redirect(w, r, path, http.StatusSeeOther)
 			return nil
 		}
