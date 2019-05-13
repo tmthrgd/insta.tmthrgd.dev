@@ -39,15 +39,10 @@ type errorData struct {
 
 // notFoundHandler returns a handler that serves a 404 error page.
 func notFoundHandler() http.HandlerFunc {
-	h, err := handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, &errorData{
+	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, &errorData{
 		http.StatusNotFound,
 		"The requested file was not found.",
-	}, "text/html; charset=utf-8")
-	if err != nil {
-		panic(err)
-	}
-
-	return h.ServeHTTP
+	}, "text/html; charset=utf-8")).ServeHTTP
 }
 
 // faviconHandler returns a handler that serves the favicon.ico file.

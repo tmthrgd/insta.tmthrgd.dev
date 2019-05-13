@@ -28,10 +28,5 @@ var indexTmpl = newTemplate(`<!doctype html>
 <script defer src={{assetPath "/index.js"}}></script>`)
 
 func indexHandler() http.HandlerFunc {
-	h, err := handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	return h.ServeHTTP
+	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
 }
