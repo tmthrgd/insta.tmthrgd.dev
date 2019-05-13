@@ -12,24 +12,12 @@ import (
 	"time"
 
 	"github.com/shurcooL/httpfs/filter"
+	"github.com/shurcooL/httpfs/html/vfstemplate"
 	handlers "github.com/tmthrgd/httphandlers"
 	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
+	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/templates"
 	"tmthrgd.dev/go/vfshash"
 )
-
-var errorTmpl = newTemplate(`<!doctype html>
-<html lang=en>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>{{.StatusCode}} {{httpStatusText .StatusCode}} – insta.tmthrgd.dev</title>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
-<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel=stylesheet href={{assetPath "/error.css"}}>
-<main class=container>
-<h1>{{.StatusCode}} {{httpStatusText .StatusCode}}</h1>
-<p>{{.Message}}</p>
-</main>`)
 
 const robots = "User-agent: *\nDisallow: /"
 
@@ -45,9 +33,18 @@ var notFoundData = &errorData{
 	"The requested file was not found.",
 }
 
+var errorTmpl = newTemplate("error.tmpl")
+
 // notFoundHandler returns a handler that serves a 404 error page.
 func notFoundHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, notFoundData, "text/html; charset=utf-8")).ServeHTTP
+}
+
+var indexTmpl = newTemplate("index.tmpl")
+
+// indexHandler returns a handler that serves the index page.
+func indexHandler() http.HandlerFunc {
+	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
 }
 
 // faviconHandler returns a handler that serves the favicon.ico file.
@@ -125,10 +122,12 @@ func templateExecute(w http.ResponseWriter, tmpl *template.Template, data interf
 	return nil
 }
 
-// newTemplate parses source and returns a new html/template.Template. It
-// panics if source is invalid.
-func newTemplate(source string) *template.Template {
-	return template.Must(template.New("").Funcs(templateFuncs).Parse(source))
+// newTemplate parses the template at templates/name and returns a new
+// html/template.Template. It panics if the source is invalid or the template
+// doesn't exist.
+func newTemplate(name string) *template.Template {
+	t := template.New(name).Funcs(templateFuncs)
+	return template.Must(vfstemplate.ParseFiles(templates.FileSystem, t, name))
 }
 
 var templateFuncs = template.FuncMap{

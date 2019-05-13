@@ -1,13 +1,4 @@
-package main
-
-import (
-	"net/http"
-	"time"
-
-	handlers "github.com/tmthrgd/httphandlers"
-)
-
-var indexTmpl = newTemplate(`<!doctype html>
+<!doctype html>
 <html lang=en>
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
@@ -25,8 +16,4 @@ var indexTmpl = newTemplate(`<!doctype html>
 <input type=submit value=Download>
 </form>
 </main>
-<script defer src={{assetPath "/index.js"}}></script>`)
-
-func indexHandler() http.HandlerFunc {
-	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
-}
+<script defer src={{assetPath "/index.js"}}></script>

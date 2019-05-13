@@ -13,26 +13,7 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-var postTmpl = newTemplate(`<!doctype html>
-<html lang=en>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<title>{{.PostID}} – insta.tmthrgd.dev</title>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin=anonymous>
-<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY=" crossorigin=anonymous>
-<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel=stylesheet href={{assetPath "/post.css"}}>
-<main class=container>
-{{- if eq (len .DisplayURLs) 1}}
-<img class=post-image src="{{index .DisplayURLs 0}}" alt="{{index .AccessibilityCaptions 0}}">
-{{- else}}
-<ul class=post-images>
-{{- range $idx, $image := .DisplayURLs}}
-<li><img class=post-image src="{{.}}" alt="{{index $.AccessibilityCaptions $idx}}"></li>
-{{- end}}
-</ul>
-{{- end}}
-</main>`)
+var postTmpl = newTemplate("post.tmpl")
 
 var (
 	errNoDisplayURL   = errors.New("unable to find display_url in window._sharedData")
