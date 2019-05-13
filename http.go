@@ -39,12 +39,14 @@ type errorData struct {
 	Message    string
 }
 
+var notFoundData = &errorData{
+	http.StatusNotFound,
+	"The requested file was not found.",
+}
+
 // notFoundHandler returns a handler that serves a 404 error page.
 func notFoundHandler() http.HandlerFunc {
-	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, &errorData{
-		http.StatusNotFound,
-		"The requested file was not found.",
-	}, "text/html; charset=utf-8")).ServeHTTP
+	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, notFoundData, "text/html; charset=utf-8")).ServeHTTP
 }
 
 // faviconHandler returns a handler that serves the favicon.ico file.
@@ -72,37 +74,37 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			return
 		}
 
-		var (
-			statusCode = http.StatusInternalServerError
-			msg        string
-		)
+		data := &errorData{
+			StatusCode: http.StatusInternalServerError,
+		}
 		switch err := err.(type) {
 		case httpError:
-			statusCode = http.StatusBadGateway
-
-			if err.StatusCode == http.StatusNotFound {
-				statusCode = http.StatusNotFound
-				msg = "The requested file was not found."
+			switch err.StatusCode {
+			case http.StatusNotFound:
+				data = notFoundData
+			default:
+				data.StatusCode = http.StatusBadGateway
 			}
 		case *url.Error:
 			// TODO: use errors.Is once go1.13 lands.
 			if err.Err == errPrivateAccount {
-				statusCode = http.StatusForbidden
-				msg = "This post belongs to a private Instagram account."
+				data.StatusCode = http.StatusForbidden
+				data.Message = "This post belongs to a private Instagram account."
+			}
+		default:
+			if os.IsNotExist(err) {
+				data = notFoundData
 			}
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(statusCode)
+		w.WriteHeader(data.StatusCode)
 
-		if msg == "" {
-			msg = reflect.ValueOf(err).Type().String() + ": " + err.Error()
+		if data.Message == "" {
+			data.Message = reflect.ValueOf(err).Type().String() + ": " + err.Error()
 		}
 
-		errorTmpl.Execute(w, &errorData{
-			statusCode,
-			msg,
-		})
+		errorTmpl.Execute(w, data)
 	}
 }
 

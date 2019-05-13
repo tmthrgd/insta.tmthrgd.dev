@@ -17,10 +17,10 @@ var indexTmpl = newTemplate(`<!doctype html>
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel=stylesheet href={{assetPath "/index.css"}}>
 <main class=container>
-<form action="" class=download-form>
+<form action=/p method=get class=download-form>
 <div class=row>
 <label for=url>Instagram URL: </label>
-<input type=url class=u-full-width id=url required placeholder=https://www.instagram.com/p/... pattern="https?://(www\.|m\.)?instagram\.com/(.+/)?p/[A-Za-z0-9\-_]+/?(\?.*)?(#.*)?">
+<input type=url class=u-full-width name=url id=url required placeholder=https://www.instagram.com/p/... pattern="https?://(www\.|m\.)?instagram\.com/(.+/)?p/[A-Za-z0-9\-_]+/?(\?.*)?(#.*)?">
 </div>
 <input type=submit value=Download>
 </form>

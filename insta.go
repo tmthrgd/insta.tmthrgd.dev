@@ -45,6 +45,8 @@ func main() {
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=3600"), // 1 hour
 		).Get("/", indexHandler())
 
+		r.With(middleware.NoCache).Get("/p", pRedirectHandler())
+
 		post := postHandler()
 		rr := r.With(
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=300"), // 5 minutes
