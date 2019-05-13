@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"strings"
 	"time"
 
 	handlers "github.com/tmthrgd/httphandlers"
@@ -147,7 +148,7 @@ func (fs *noDirFileSystem) Open(name string) (http.File, error) {
 	if stat, err := f.Stat(); err != nil {
 		f.Close()
 		return nil, err
-	} else if stat.IsDir() {
+	} else if stat.IsDir() || strings.HasPrefix(stat.Name(), ".") {
 		f.Close()
 		return nil, &os.PathError{Op: "open", Path: name, Err: os.ErrNotExist}
 	}
