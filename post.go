@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi"
-
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 	"golang.org/x/net/html/charset"
@@ -25,11 +24,11 @@ var postTmpl = newTemplate(`<!doctype html>
 <link rel=stylesheet href={{assetPath "/post.css"}}>
 <main class=container>
 {{- if eq (len .DisplayURLs) 1}}
-<img class=post-image src="{{index .DisplayURLs 0}}">
+<img class=post-image src="{{index .DisplayURLs 0}}" alt="{{index .AccessibilityCaptions 0}}">
 {{- else}}
 <ul class=post-images>
-{{- range .DisplayURLs}}
-<li><img class=post-image src="{{.}}"></li>
+{{- range $idx, $image := .DisplayURLs}}
+<li><img class=post-image src="{{.}}" alt="{{index $.AccessibilityCaptions $idx}}"></li>
 {{- end}}
 </ul>
 {{- end}}
@@ -93,7 +92,7 @@ func postHandler() http.HandlerFunc {
 			return err
 		}
 
-		displayURLs, err := processJSONData(node)
+		data, err := processJSONData(node)
 		if err != nil {
 			return err
 		}
@@ -101,21 +100,23 @@ func postHandler() http.HandlerFunc {
 		if strings.HasSuffix(r.URL.Path, "/json") {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			return json.NewEncoder(w).Encode(&struct {
-				PostID string   `json:"post_id"`
-				Images []string `json:"images"`
+				PostID  string   `json:"post_id"`
+				Caption string   `json:"caption,omitempty"`
+				Images  []string `json:"images"`
 			}{
 				chi.URLParam(r, "postID"),
-				displayURLs,
+				data.Caption,
+				data.DisplayURLs,
 			})
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		return templateExecute(w, postTmpl, &struct {
-			PostID      string
-			DisplayURLs []string
+			PostID string
+			*jsonData
 		}{
 			chi.URLParam(r, "postID"),
-			displayURLs,
+			data,
 		})
 	})
 }
@@ -154,7 +155,7 @@ func nodeIsJSONData(n *html.Node) bool {
 		strings.HasPrefix(n.FirstChild.Data, "window._sharedData")
 }
 
-func processJSONData(n *html.Node) ([]string, error) {
+func processJSONData(n *html.Node) (*jsonData, error) {
 	data := n.FirstChild.Data
 	data = strings.TrimLeftFunc(data, func(r rune) bool {
 		return r != '{' // everything until the opening bracket
@@ -173,26 +174,48 @@ func processJSONData(n *html.Node) ([]string, error) {
 	}
 
 	shortcodeMedia := instData.EntryData.PostPage[0].GraphQL.ShortcodeMedia
+
+	var caption string
+	if edges := shortcodeMedia.EdgeMediaToCaption.Edges; len(edges) > 0 {
+		caption = edges[0].Node.Text
+	}
+
 	switch shortcodeMedia.Typename {
 	case "GraphImage":
 		if shortcodeMedia.DisplayURL != "" {
-			return []string{shortcodeMedia.DisplayURL}, nil
+			return &jsonData{
+				Caption:               caption,
+				DisplayURLs:           []string{shortcodeMedia.DisplayURL},
+				AccessibilityCaptions: []string{shortcodeMedia.AccessibilityCaption},
+			}, nil
 		}
 	case "GraphSidecar":
 		edges := shortcodeMedia.EdgeSidecarToChildren.Edges
 		displayURLs := make([]string, 0, len(edges))
+		captions := make([]string, 0, len(edges))
 		for _, edge := range edges {
 			if edge.Node.DisplayURL != "" {
 				displayURLs = append(displayURLs, edge.Node.DisplayURL)
+				captions = append(captions, edge.Node.AccessibilityCaption)
 			}
 		}
 
 		if len(displayURLs) > 0 {
-			return displayURLs, nil
+			return &jsonData{
+				Caption:               caption,
+				DisplayURLs:           displayURLs,
+				AccessibilityCaptions: captions,
+			}, nil
 		}
 	}
 
 	return nil, errNoDisplayURL
+}
+
+type jsonData struct {
+	Caption               string
+	DisplayURLs           []string
+	AccessibilityCaptions []string
 }
 
 type instagramGraphSchema struct {
@@ -202,13 +225,22 @@ type instagramGraphSchema struct {
 				ShortcodeMedia struct {
 					Typename              string `json:"__typename"`
 					DisplayURL            string `json:"display_url"`
+					AccessibilityCaption  string `json:"accessibility_caption"`
 					EdgeSidecarToChildren struct {
 						Edges []struct {
 							Node struct {
-								DisplayURL string `json:"display_url"`
+								DisplayURL           string `json:"display_url"`
+								AccessibilityCaption string `json:"accessibility_caption"`
 							}
 						}
 					} `json:"edge_sidecar_to_children"`
+					EdgeMediaToCaption struct {
+						Edges []struct {
+							Node struct {
+								Text string
+							}
+						}
+					} `json:"edge_media_to_caption"`
 				} `json:"shortcode_media"`
 			} `json:"graphql"`
 		}
