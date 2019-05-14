@@ -25,6 +25,11 @@ const robots = "User-agent: *\nDisallow: /"
 
 var assetNames = vfshash.NewAssetNames(assets.FileSystem)
 
+var (
+	errorTmpl = newTemplate("error.tmpl")
+	indexTmpl = newTemplate("index.tmpl")
+)
+
 type errorData struct {
 	StatusCode int
 	Message    string
@@ -35,14 +40,10 @@ var notFoundData = &errorData{
 	"The requested file was not found.",
 }
 
-var errorTmpl = newTemplate("error.tmpl")
-
 // notFoundHandler returns a handler that serves a 404 error page.
 func notFoundHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, notFoundData, "text/html; charset=utf-8")).ServeHTTP
 }
-
-var indexTmpl = newTemplate("index.tmpl")
 
 // indexHandler returns a handler that serves the index page.
 func indexHandler() http.HandlerFunc {
