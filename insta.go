@@ -25,6 +25,7 @@ func main() {
 		gziphandler.Wrapper(),
 	)
 	router.NotFound(notFoundHandler())
+	router.MethodNotAllowed(methodNotAllowedHandler())
 
 	// Asset routes
 	router.Group(func(r chi.Router) {

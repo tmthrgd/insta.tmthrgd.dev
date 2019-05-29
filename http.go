@@ -45,6 +45,17 @@ func notFoundHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, notFoundData, "text/html; charset=utf-8")).ServeHTTP
 }
 
+// methodNotAllowedHandler returns a handler that serves a 405 Method Not
+// Allowed error.
+func methodNotAllowedHandler() http.HandlerFunc {
+	data := &errorData{
+		http.StatusMethodNotAllowed,
+		"The requested method is not allowed for this resource.",
+	}
+	h := handlers.Must(handlers.ServeErrorTemplate(http.StatusMethodNotAllowed, errorTmpl, data, "text/html; charset=utf-8"))
+	return handlers.SetHeader(h, "Allow", "GET, HEAD").ServeHTTP
+}
+
 // indexHandler returns a handler that serves the index page.
 func indexHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
