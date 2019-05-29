@@ -4,12 +4,11 @@
 FROM golang:1.12 as builder
 
 # Set the needed GO* environment variables.
-ENV GO111MODULE=on
 ENV GOPROXY=https://proxy.golang.org
 ENV CGO_ENABLED=0
 
-# Set the working directory to a $GOPATH subdirectory.
-WORKDIR /go/src/go.tmthrgd.dev/insta.tmthrgd.dev
+# Set the working directory to a $GOPATH subdirectory, not under $GOPATH/src.
+WORKDIR /go/docker
 
 # Copy only the files needed to resolve go mod dependencies.
 COPY go.mod go.mod
