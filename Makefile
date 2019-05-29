@@ -18,5 +18,5 @@ docker-stop:
 	docker stop $(shell docker ps -f ancestor=insta-tmthrgd-dev-server --format "{{.ID}}")
 
 deploy:
-	gcloud builds submit --tag gcr.io/insta-tmthrgd-dev/server
-	gcloud beta run deploy server --image gcr.io/insta-tmthrgd-dev/server
+	gcloud --project insta-tmthrgd-dev builds submit --tag gcr.io/insta-tmthrgd-dev/server
+	gcloud --project insta-tmthrgd-dev beta run deploy server --image gcr.io/insta-tmthrgd-dev/server
