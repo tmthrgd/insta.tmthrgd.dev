@@ -1,4 +1,4 @@
-package main // import "tmthrgd.dev/go/insta.tmthrgd.dev"
+package main // import "go.tmthrgd.dev/insta.tmthrgd.dev"
 
 //go:generate go run -tags=dev internal/assets/generate.go
 //go:generate go run -tags=dev internal/templates/generate.go

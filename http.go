@@ -16,9 +16,9 @@ import (
 	"github.com/shurcooL/httpfs/filter"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 	handlers "github.com/tmthrgd/httphandlers"
-	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
-	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/templates"
-	"tmthrgd.dev/go/vfshash"
+	"go.tmthrgd.dev/insta.tmthrgd.dev/internal/assets"
+	"go.tmthrgd.dev/insta.tmthrgd.dev/internal/templates"
+	"go.tmthrgd.dev/vfshash"
 )
 
 const robots = "User-agent: *\nDisallow: /"

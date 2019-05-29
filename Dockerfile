@@ -9,7 +9,7 @@ ENV GOPROXY=https://proxy.golang.org
 ENV CGO_ENABLED=0
 
 # Set the working directory to a $GOPATH subdirectory.
-WORKDIR /go/src/tmthrgd.dev/go/insta.tmthrgd.dev
+WORKDIR /go/src/go.tmthrgd.dev/insta.tmthrgd.dev
 
 # Copy only the files needed to resolve go mod dependencies.
 COPY go.mod go.mod

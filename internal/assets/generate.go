@@ -6,8 +6,8 @@ import (
 	"log"
 
 	"github.com/shurcooL/vfsgen"
-	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/assets"
-	"tmthrgd.dev/go/vfshash"
+	"go.tmthrgd.dev/insta.tmthrgd.dev/internal/assets"
+	"go.tmthrgd.dev/vfshash"
 )
 
 func main() {

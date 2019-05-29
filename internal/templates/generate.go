@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/shurcooL/vfsgen"
-	"tmthrgd.dev/go/insta.tmthrgd.dev/internal/templates"
+	"go.tmthrgd.dev/insta.tmthrgd.dev/internal/templates"
 )
 
 func main() {

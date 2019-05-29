@@ -1,4 +1,4 @@
-module tmthrgd.dev/go/insta.tmthrgd.dev
+module go.tmthrgd.dev/insta.tmthrgd.dev
 
 go 1.12
 
@@ -9,6 +9,7 @@ require (
 	github.com/tmthrgd/gziphandler v0.0.0-20190303121617-ae837a951453
 	github.com/tmthrgd/httphandlers v0.0.0-20190513021200-f1d2c578ad2b
 	github.com/tmthrgd/httputils v0.0.0-20190303111359-ec3de85dbccd // indirect
+	go.tmthrgd.dev/vfshash v0.0.0-20190529072848-4502cf43440f
 	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
-	tmthrgd.dev/go/vfshash v0.0.0-20190513022450-8b54546efbd9
+	golang.org/x/tools v0.0.0-20190529010454-aa71c3f32488 // indirect
 )
