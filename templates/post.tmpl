@@ -9,11 +9,11 @@
 <link rel=stylesheet href={{assetPath "/post.css"}}>
 <main class=container>
 {{- if eq (len .DisplayURLs) 1}}
-<img class=post-image src="{{index .DisplayURLs 0}}" alt="{{index .AccessibilityCaptions 0}}">
+<img class=post-image src="{{index .DisplayURLs 0}}" alt="{{index .AccessibilityCaptions 0}}" referrerpolicy=no-referrer>
 {{- else}}
 <ul class=post-images>
 {{- range $idx, $image := .DisplayURLs}}
-<li><img class=post-image src="{{.}}" alt="{{index $.AccessibilityCaptions $idx}}"></li>
+<li><img class=post-image src="{{.}}" alt="{{index $.AccessibilityCaptions $idx}}" referrerpolicy=no-referrer></li>
 {{- end}}
 </ul>
 {{- end}}
