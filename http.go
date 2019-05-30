@@ -61,8 +61,9 @@ func indexHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
 }
 
-// faviconHandler returns a handler that serves the favicon.ico file.
-func faviconHandler() http.HandlerFunc {
+// asssetNamesHandler returns a handler that serves files from the assets
+// directory without name mangling.
+func asssetNamesHandler() http.HandlerFunc {
 	return http.FileServer(assetNames).ServeHTTP
 }
 
