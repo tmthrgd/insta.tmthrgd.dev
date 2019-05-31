@@ -29,7 +29,7 @@ func main() {
 
 	// Asset routes
 	router.Group(func(r chi.Router) {
-		assetNames := asssetNamesHandler()
+		assetNames := assetNamesHandler()
 
 		rr := r.With(
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=1209600"), // 14 days

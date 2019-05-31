@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"reflect"
 	"strings"
 	"time"
 
@@ -61,9 +60,9 @@ func indexHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
 }
 
-// asssetNamesHandler returns a handler that serves files from the assets
+// assetNamesHandler returns a handler that serves files from the assets
 // directory without name mangling.
-func asssetNamesHandler() http.HandlerFunc {
+func assetNamesHandler() http.HandlerFunc {
 	return http.FileServer(assetNames).ServeHTTP
 }
 
@@ -114,7 +113,7 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 		w.WriteHeader(data.StatusCode)
 
 		if data.Message == "" {
-			data.Message = reflect.ValueOf(err).Type().String() + ": " + err.Error()
+			data.Message = err.Error()
 		}
 
 		if templateExecute(w, errorTmpl, data) != nil {
@@ -150,8 +149,8 @@ func newTemplate(name string) *template.Template {
 }
 
 var templateFuncs = template.FuncMap{
-	"httpStatusText": http.StatusText,
 	"assetPath":      assetPath,
+	"httpStatusText": http.StatusText,
 }
 
 // assetPath returns the path to a named asset file.

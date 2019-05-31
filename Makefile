@@ -8,7 +8,7 @@ generate:
 	go generate
 
 serve:
-	go run --tags dev .
+	go run -tags dev .
 
 docker-serve:
 	docker build -t insta-tmthrgd-dev-server -f Dockerfile .
