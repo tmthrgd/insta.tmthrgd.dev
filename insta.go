@@ -44,7 +44,7 @@ func main() {
 				handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"), // 1 year
 			)
 		}
-		rr.Mount("/assets", assetsHandler())
+		rr.Mount(assetsPath, assetsHandler())
 
 		r.With(
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=86400"), // 1 day

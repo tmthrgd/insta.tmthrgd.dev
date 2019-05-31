@@ -20,6 +20,8 @@ import (
 	"go.tmthrgd.dev/vfshash"
 )
 
+const assetsPath = "/assets"
+
 const robots = "User-agent: *\nDisallow: /"
 
 var assetNames = vfshash.NewAssetNames(assets.FileSystem)
@@ -73,7 +75,7 @@ func robotsHandler() http.HandlerFunc {
 
 // assetsHandler returns a handler that serves site assets.
 func assetsHandler() http.Handler {
-	return http.StripPrefix("/assets", http.FileServer(filter.Skip(assets.FileSystem, excludeAssets)))
+	return http.StripPrefix(assetsPath, http.FileServer(filter.Skip(assets.FileSystem, excludeAssets)))
 }
 
 // errorHandler converts a handler with an error return to a http.HandlerFunc,
@@ -155,7 +157,7 @@ var templateFuncs = template.FuncMap{
 
 // assetPath returns the path to a named asset file.
 func assetPath(name string) string {
-	return path.Join("/assets/", assetNames.Lookup(name))
+	return path.Join(assetsPath, assetNames.Lookup(name))
 }
 
 // excludeAssets returns true if the file should be excluded from the assets handler.
