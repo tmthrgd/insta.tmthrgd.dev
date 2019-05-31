@@ -29,22 +29,26 @@ func main() {
 
 	// Asset routes
 	router.Group(func(r chi.Router) {
-		assetNames := assetNamesHandler()
+		assetNamesH := assetNamesHandler()
 
 		rr := r.With(
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=1209600"), // 14 days
 		)
-		rr.Get("/favicon.ico", assetNames)
+		rr.Get("/favicon.ico", assetNamesH)
 		rr.Get("/robots.txt", robotsHandler())
 
-		r.With(
-			handlers.NeverModified,
-			handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"), // 1 year
-		).Mount("/assets", assetsHandler())
+		rr = r
+		if assetNames.IsContentAddressable() {
+			rr = r.With(
+				handlers.NeverModified,
+				handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"), // 1 year
+			)
+		}
+		rr.Mount("/assets", assetsHandler())
 
 		r.With(
 			handlers.SetHeaderWrap("Cache-Control", "public, max-age=86400"), // 1 day
-		).Get("/.well-known/security.txt", assetNames)
+		).Get("/.well-known/security.txt", assetNamesH)
 	})
 
 	// HTML page routes
