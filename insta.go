@@ -37,9 +37,13 @@ func main() {
 		rr.Get("/favicon.ico", assetNamesH)
 		rr.Get("/robots.txt", robotsHandler())
 
-		rr = r
+		rr = r.With(
+			handlers.StatusCodeSwitchWrap(map[int]http.Handler{
+				http.StatusNotFound: notFoundHandler(),
+			}),
+		)
 		if assetNames.IsContentAddressable() {
-			rr = r.With(
+			rr = rr.With(
 				handlers.NeverModified,
 				handlers.SetHeaderWrap("Cache-Control", "public, max-age=31536000, immutable"), // 1 year
 			)
