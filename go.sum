@@ -13,8 +13,8 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/tmthrgd/gziphandler v0.0.0-20190303121617-ae837a951453 h1:A7mbNu1QStv15i15NTVAIvcW9BeCjGjEbBGp88eeRwQ=
 github.com/tmthrgd/gziphandler v0.0.0-20190303121617-ae837a951453/go.mod h1:Eaxip7qwz21YwJBuTby3jRNfqsmXseMMPQQqlku1jrk=
-github.com/tmthrgd/httphandlers v0.0.0-20190513021200-f1d2c578ad2b h1:XpER+3ff5lDMXALGQs0KAnbdwf6yty2g1+3X36ECrMo=
-github.com/tmthrgd/httphandlers v0.0.0-20190513021200-f1d2c578ad2b/go.mod h1:fnGG3Jv4sBkm8SXM1PBa6Jt38ro3R0BldglA+NpE8UM=
+github.com/tmthrgd/httphandlers v0.0.0-20190601024710-973f5c703913 h1:r8471qbmobWVd/KnRQRZeRrMQIwB1tZrKx54C4iykpM=
+github.com/tmthrgd/httphandlers v0.0.0-20190601024710-973f5c703913/go.mod h1:fnGG3Jv4sBkm8SXM1PBa6Jt38ro3R0BldglA+NpE8UM=
 github.com/tmthrgd/httputils v0.0.0-20190303111359-ec3de85dbccd h1:mP4Vop1OAMLUhEwK+7qpN0J16nfxpM9yVV7jnWvVPQs=
 github.com/tmthrgd/httputils v0.0.0-20190303111359-ec3de85dbccd/go.mod h1:8/hVmIZ6TizbEnBWYbs6KT+SazQ4St36+7yVBjxvk0I=
 go.tmthrgd.dev/vfshash v0.0.0-20190531093011-cc3700bd94ce h1:X8fLx8Fuzl8r7CUL9fjCjRHPZ65JTqRzCA87Crk6nS8=

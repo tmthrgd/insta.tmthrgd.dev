@@ -20,6 +20,11 @@ func main() {
 		middleware.GetHead,
 		handlers.SecurityHeadersWrap(&handlers.SecurityHeaders{
 			ContentSecurityPolicy: "default-src 'none'; script-src 'self'; style-src 'self' https:; img-src 'self' https:; font-src https:; frame-ancestors 'none'; block-all-mixed-content; sandbox allow-forms allow-scripts; base-uri 'none'; report-uri https://tomthorogood.report-uri.com/r/d/csp/enforce",
+
+			StrictTransportSecurity: "max-age=31536000; includeSubDomains; preload",
+
+			ReportTo: `{"group":"default","max_age":31536000,"endpoints":[{"url":"https://tomthorogood.report-uri.com/a/d/g"}],"include_subdomains":true}`,
+			NEL:      `{"report_to":"default","max_age":31536000,"include_subdomains":true}`,
 		}),
 		handlers.SetHeaderWrap("Server", "insta.tmthrgd.dev"),
 		gziphandler.Wrapper(),
