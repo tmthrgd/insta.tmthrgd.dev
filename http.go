@@ -62,20 +62,25 @@ func indexHandler() http.HandlerFunc {
 	return handlers.Must(handlers.ServeTemplate("index.html", time.Now(), indexTmpl, nil)).ServeHTTP
 }
 
+// robotsHandler returns a handler that serves the robots.txt file.
+func robotsHandler() http.HandlerFunc {
+	return handlers.ServeString("robots.txt", time.Now(), robots).ServeHTTP
+}
+
 // assetNamesHandler returns a handler that serves files from the assets
 // directory without name mangling.
 func assetNamesHandler() http.HandlerFunc {
 	return http.FileServer(assetNames).ServeHTTP
 }
 
-// robotsHandler returns a handler that serves the robots.txt file.
-func robotsHandler() http.HandlerFunc {
-	return handlers.ServeString("robots.txt", time.Now(), robots).ServeHTTP
-}
-
 // assetsHandler returns a handler that serves site assets.
 func assetsHandler() http.Handler {
 	return http.StripPrefix(assetsPath, http.FileServer(filter.Skip(assets.FileSystem, excludeAssets)))
+}
+
+// excludeAssets returns true if the file should be excluded from the assets handler.
+func excludeAssets(path string, info os.FileInfo) bool {
+	return info.IsDir() || strings.HasPrefix(info.Name(), ".")
 }
 
 // errorHandler converts a handler with an error return to a http.HandlerFunc,
@@ -158,11 +163,6 @@ var templateFuncs = template.FuncMap{
 // assetPath returns the path to a named asset file.
 func assetPath(name string) string {
 	return path.Join(assetsPath, assetNames.Lookup(name))
-}
-
-// excludeAssets returns true if the file should be excluded from the assets handler.
-func excludeAssets(path string, info os.FileInfo) bool {
-	return info.IsDir() || strings.HasPrefix(info.Name(), ".")
 }
 
 type httpError struct{ *http.Response }
