@@ -85,14 +85,14 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 
 		hdr := w.Header()
 		statusCode := http.StatusInternalServerError
-		errorMsg := err.Error()
+		errorMsg := html.EscapeString(err.Error())
 		switch err := err.(type) {
 		case methodNotAllowedError:
 			hdr.Set("Allow", string(err))
 
 			statusCode = http.StatusMethodNotAllowed
-			errorMsg = fmt.Sprintf("The request method %s is inappropriate for the URL %s.",
-				r.Method, r.URL.Path)
+			errorMsg = fmt.Sprintf("The request method <code>%s</code> is inappropriate for the URL <code>%s</code>.",
+				html.EscapeString(r.Method), html.EscapeString(r.URL.Path))
 		case httpError:
 			switch err.StatusCode {
 			case http.StatusNotFound:
@@ -119,14 +119,13 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 
 		if templateExecute(w, errorTmpl, &struct {
 			StatusCode int
-			Message    string
+			Message    template.HTML
 		}{
 			StatusCode: statusCode,
-			Message:    errorMsg,
+			Message:    template.HTML(errorMsg),
 		}) != nil {
 			fmt.Fprintf(w, "%d %s: %s", statusCode,
-				http.StatusText(statusCode),
-				html.EscapeString(errorMsg))
+				http.StatusText(statusCode), errorMsg)
 		}
 	}
 }
