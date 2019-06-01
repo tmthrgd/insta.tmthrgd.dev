@@ -31,30 +31,18 @@ var (
 	indexTmpl = newTemplate("index.tmpl")
 )
 
-type errorData struct {
-	StatusCode int
-	Message    string
-}
-
-var notFoundData = &errorData{
-	http.StatusNotFound,
-	"The requested file was not found.",
-}
-
-// notFoundHandler returns a handler that serves a 404 error page.
+// notFoundHandler returns a handler that serves a 404 Not Found error.
 func notFoundHandler() http.HandlerFunc {
-	return handlers.Must(handlers.ServeErrorTemplate(http.StatusNotFound, errorTmpl, notFoundData, "text/html; charset=utf-8")).ServeHTTP
+	return errorHandler(func(http.ResponseWriter, *http.Request) error {
+		return os.ErrNotExist
+	})
 }
 
 // methodNotAllowedHandler returns a handler that serves a 405 Method Not
 // Allowed error.
 func methodNotAllowedHandler() http.HandlerFunc {
-	data := &errorData{
-		http.StatusMethodNotAllowed,
-		"The requested method is not allowed for this resource.",
-	}
-	h := handlers.Must(handlers.ServeErrorTemplate(http.StatusMethodNotAllowed, errorTmpl, data, "text/html; charset=utf-8"))
-	return handlers.SetHeader(h, "Allow", "GET, HEAD").ServeHTTP
+	var err error = methodNotAllowedError("GET, HEAD")
+	return errorHandler(func(http.ResponseWriter, *http.Request) error { return err })
 }
 
 // indexHandler returns a handler that serves the index page.
@@ -93,40 +81,52 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			return
 		}
 
-		data := &errorData{
-			StatusCode: http.StatusInternalServerError,
-		}
+		const notFoundMsg = "The requested file was not found."
+
+		hdr := w.Header()
+		statusCode := http.StatusInternalServerError
+		errorMsg := err.Error()
 		switch err := err.(type) {
+		case methodNotAllowedError:
+			hdr.Set("Allow", string(err))
+
+			statusCode = http.StatusMethodNotAllowed
+			errorMsg = fmt.Sprintf("The request method %s is inappropriate for the URL %s.",
+				r.Method, r.URL.Path)
 		case httpError:
 			switch err.StatusCode {
 			case http.StatusNotFound:
-				data = notFoundData
+				statusCode = http.StatusNotFound
+				errorMsg = notFoundMsg
 			default:
-				data.StatusCode = http.StatusBadGateway
+				statusCode = http.StatusBadGateway
 			}
 		case *url.Error:
 			// TODO: use errors.Is once go1.13 lands.
 			if err.Err == errPrivateAccount {
-				data.StatusCode = http.StatusForbidden
-				data.Message = "This post belongs to a private Instagram account."
+				statusCode = http.StatusForbidden
+				errorMsg = "This post belongs to a private Instagram account."
 			}
 		default:
 			if os.IsNotExist(err) {
-				data = notFoundData
+				statusCode = http.StatusNotFound
+				errorMsg = notFoundMsg
 			}
 		}
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(data.StatusCode)
+		hdr.Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(statusCode)
 
-		if data.Message == "" {
-			data.Message = err.Error()
-		}
-
-		if templateExecute(w, errorTmpl, data) != nil {
-			fmt.Fprintf(w, "%d %s: %s", data.StatusCode,
-				http.StatusText(data.StatusCode),
-				html.EscapeString(data.Message))
+		if templateExecute(w, errorTmpl, &struct {
+			StatusCode int
+			Message    string
+		}{
+			StatusCode: statusCode,
+			Message:    errorMsg,
+		}) != nil {
+			fmt.Fprintf(w, "%d %s: %s", statusCode,
+				http.StatusText(statusCode),
+				html.EscapeString(errorMsg))
 		}
 	}
 }
@@ -163,6 +163,12 @@ var templateFuncs = template.FuncMap{
 // assetPath returns the path to a named asset file.
 func assetPath(name string) string {
 	return path.Join(assetsPath, assetNames.Lookup(name))
+}
+
+type methodNotAllowedError string
+
+func (methodNotAllowedError) Error() string {
+	return "the request method is inappropriate for the requested URL"
 }
 
 type httpError struct{ *http.Response }
