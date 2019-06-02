@@ -27,6 +27,7 @@ func main() {
 			NEL:      `{"report_to":"default","max_age":31536000,"include_subdomains":true}`,
 		}),
 		handlers.SetHeaderWrap("Server", "insta.tmthrgd.dev"),
+		httpsOnly,
 		gziphandler.Wrapper(),
 	)
 	router.NotFound(notFoundHandler())

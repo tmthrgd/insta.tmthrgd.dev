@@ -71,6 +71,23 @@ func excludeAssets(path string, info os.FileInfo) bool {
 	return info.IsDir() || strings.HasPrefix(info.Name(), ".")
 }
 
+// httpsOnly is a http.Handler middleware that redirects http requests to https when
+// behind Google Frontend.
+func httpsOnly(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Forwarded-Proto") == "http" {
+			u := *r.URL
+			u.Scheme = "https"
+			u.Host = "insta.tmthrgd.dev"
+
+			http.Redirect(w, r, u.String(), http.StatusPermanentRedirect)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // errorHandler converts a handler with an error return to a http.HandlerFunc,
 // sending a 500 Internal Server Error, or a 502 Bad Gateway where appropriate,
 // to the client when an error is returned.
