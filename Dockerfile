@@ -4,15 +4,14 @@
 FROM golang:1.12 as builder
 
 # Set the needed GO* environment variables.
-ENV GOPROXY=https://proxy.golang.org
-ENV CGO_ENABLED=0
+ENV GOPROXY=https://proxy.golang.org \
+	CGO_ENABLED=0
 
 # Set the working directory to a $GOPATH subdirectory, not under $GOPATH/src.
 WORKDIR /go/docker
 
 # Copy only the files needed to resolve go mod dependencies.
-COPY go.mod go.mod
-COPY go.sum go.sum
+COPY go.mod go.sum ./
 
 # Prefetch all the needed dependencies before copying code in. This way
 # code changes that don't affect go.mod or go.sum can use cached modules.
