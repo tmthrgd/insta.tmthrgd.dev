@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html"
 	"html/template"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -118,14 +118,12 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			default:
 				statusCode = http.StatusBadGateway
 			}
-		case *url.Error:
-			// TODO: use errors.Is once go1.13 lands.
-			if err.Err == errPrivateAccount {
+		default:
+			switch {
+			case errors.Is(err, errPrivateAccount):
 				statusCode = http.StatusForbidden
 				errorMsg = "This post belongs to a private Instagram account."
-			}
-		default:
-			if os.IsNotExist(err) {
+			case os.IsNotExist(err):
 				statusCode = http.StatusNotFound
 				errorMsg = notFoundMsg
 			}
