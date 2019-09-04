@@ -1,11 +1,10 @@
 # Use the offical Golang image to create a build artifact.
 # This is based on Debian and sets the GOPATH to /go.
 # https://hub.docker.com/_/golang
-FROM golang:1.12 as builder
+FROM golang:1.13 as builder
 
 # Set the needed GO* environment variables.
-ENV GOPROXY=https://proxy.golang.org \
-	CGO_ENABLED=0
+ENV CGO_ENABLED=0
 
 # Set the working directory to a $GOPATH subdirectory, not under $GOPATH/src.
 WORKDIR /go/docker
