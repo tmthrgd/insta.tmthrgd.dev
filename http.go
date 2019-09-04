@@ -89,8 +89,7 @@ func httpsOnly(next http.Handler) http.Handler {
 }
 
 // errorHandler converts a handler with an error return to a http.HandlerFunc,
-// sending a 500 Internal Server Error, or a 502 Bad Gateway where appropriate,
-// to the client when an error is returned.
+// sending a HTTP error code to the client appropriate for a given error.
 func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r)
@@ -98,35 +97,25 @@ func errorHandler(handler func(http.ResponseWriter, *http.Request) error) http.H
 			return
 		}
 
-		const notFoundMsg = "The requested file was not found."
-
 		hdr := w.Header()
 		statusCode := http.StatusInternalServerError
 		errorMsg := html.EscapeString(err.Error())
-		switch err := err.(type) {
-		case methodNotAllowedError:
-			hdr.Set("Allow", string(err))
+		var methodErr methodNotAllowedError
+		switch {
+		case errors.Is(err, errPrivateAccount):
+			statusCode = http.StatusForbidden
+			errorMsg = "This post belongs to a private Instagram account."
+		case errors.Is(err, os.ErrNotExist):
+			statusCode = http.StatusNotFound
+			errorMsg = "The requested file was not found."
+		case errors.As(err, new(httpError)):
+			statusCode = http.StatusBadGateway
+		case errors.As(err, &methodErr):
+			hdr.Set("Allow", string(methodErr))
 
 			statusCode = http.StatusMethodNotAllowed
 			errorMsg = fmt.Sprintf("The request method <code>%s</code> is inappropriate for the URL <code>%s</code>.",
 				html.EscapeString(r.Method), html.EscapeString(r.URL.Path))
-		case httpError:
-			switch err.StatusCode {
-			case http.StatusNotFound:
-				statusCode = http.StatusNotFound
-				errorMsg = notFoundMsg
-			default:
-				statusCode = http.StatusBadGateway
-			}
-		default:
-			switch {
-			case errors.Is(err, errPrivateAccount):
-				statusCode = http.StatusForbidden
-				errorMsg = "This post belongs to a private Instagram account."
-			case os.IsNotExist(err):
-				statusCode = http.StatusNotFound
-				errorMsg = notFoundMsg
-			}
 		}
 
 		hdr.Set("Content-Type", "text/html; charset=utf-8")
@@ -189,4 +178,13 @@ type httpError struct{ *http.Response }
 
 func (he httpError) Error() string {
 	return "upstream HTTP error: " + he.Response.Request.URL.String() + ": " + he.Response.Status
+}
+
+func (he httpError) Is(target error) bool {
+	switch he.Response.StatusCode {
+	case http.StatusNotFound:
+		return target == os.ErrNotExist
+	default:
+		return false
+	}
 }
