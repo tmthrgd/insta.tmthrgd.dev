@@ -44,9 +44,7 @@ func postHandler() http.HandlerFunc {
 			Host:   "www.instagram.com",
 			Path:   path,
 		}
-		// TODO: use http.NewRequestWithContext once go1.13 lands.
-		req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
-		req = req.WithContext(r.Context())
+		req, _ := http.NewRequestWithContext(r.Context(), http.MethodGet, u.String(), nil)
 
 		resp, err := postClient.Do(req)
 		if err != nil {
