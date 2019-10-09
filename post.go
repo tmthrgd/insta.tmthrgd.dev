@@ -23,6 +23,9 @@ var (
 var postClient = &http.Client{
 	Transport: http.DefaultTransport,
 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
 		if strings.Contains(via[0].URL.Path, "/p/") &&
 			!strings.Contains(req.URL.Path, "/p/") {
 			return errPrivateAccount
