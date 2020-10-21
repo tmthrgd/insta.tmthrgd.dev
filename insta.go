@@ -56,9 +56,8 @@ func main() {
 		}
 		rr.Mount(assetsPath, assetsHandler())
 
-		r.With(
-			handlers.SetHeaderWrap("Cache-Control", "public, max-age=86400"), // 1 day
-		).Get("/.well-known/security.txt", assetNamesH)
+		securityTxtH := http.RedirectHandler("https://tomthorogood.uk/.well-known/security.txt", http.StatusFound).ServeHTTP
+		r.Get("/.well-known/security.txt", securityTxtH)
 	})
 
 	// HTML page routes
